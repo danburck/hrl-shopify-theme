@@ -1,0 +1,71 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "HRL Theme",
+    "theme_version": "1.0.0",
+    "theme_author": "Hyper Real Love",
+    "theme_documentation_url": "https://github.com/danburck/hrl-shopify-theme",
+    "theme_support_url": "https://github.com/danburck/hrl-shopify-theme/issues"
+  },
+  {
+    "name": "Brand",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo (light / on black)"
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon"
+      }
+    ]
+  },
+  {
+    "name": "Announcement Bar",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_announcement",
+        "label": "Show announcement bar",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "announcement_text",
+        "label": "Announcement text",
+        "default": "OUT OF STOCK ITEMS MAY BE REFUNDED"
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_yellow",
+        "label": "Yellow",
+        "default": "#fffb29"
+      },
+      {
+        "type": "color",
+        "id": "color_beige",
+        "label": "Beige",
+        "default": "#faf9f6"
+      },
+      {
+        "type": "color",
+        "id": "color_black",
+        "label": "Black",
+        "default": "#101010"
+      },
+      {
+        "type": "color",
+        "id": "color_red",
+        "label": "Red",
+        "default": "#ff0004"
+      }
+    ]
+  }
+]

@@ -1,0 +1,54 @@
+<!-- Mobile Cart Drawer (full screen) -->
+<div
+  id="mobile-cart-drawer"
+  class="mobile-cart-drawer"
+  role="dialog"
+  aria-label="Shopping cart"
+  aria-modal="true"
+  aria-hidden="true"
+>
+  <div class="mobile-cart-drawer__header">
+    <h2 class="title title-md">Cart</h2>
+    <button
+      id="mobile-cart-close"
+      class="mobile-cart-drawer__close"
+      aria-label="Close cart"
+    >&#x2715;</button>
+  </div>
+
+  <div class="cart-drawer__body">
+    {%- if cart.item_count == 0 -%}
+      <p class="cart-drawer__empty">Your cart is empty.</p>
+    {%- else -%}
+      {%- for item in cart.items -%}
+        <div class="cart-item">
+          <img
+            class="cart-item__image"
+            src="{{ item.image | image_url: width: 160 }}"
+            alt="{{ item.title | escape }}"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <div class="cart-item__info">
+            <p class="cart-item__name">{{ item.product.title }}</p>
+            {%- if item.variant.title != 'Default Title' -%}
+              <p class="text-sm">{{ item.variant.title }}</p>
+            {%- endif -%}
+            <p class="cart-item__price">{{ item.final_line_price | money }}</p>
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+
+  <div class="cart-drawer__footer">
+    {%- if cart.item_count > 0 -%}
+      <div class="flex justify-between items-center">
+        <span class="title title-md">Total</span>
+        <span class="text-md">{{ cart.total_price | money }}</span>
+      </div>
+      <a href="/checkouts" class="btn-checkout">Proceed to Checkout</a>
+    {%- endif -%}
+  </div>
+</div>

@@ -1,0 +1,26 @@
+{
+  "general": {
+    "cart": {
+      "title": "Cart",
+      "empty": "Your cart is empty.",
+      "checkout": "Proceed to Checkout"
+    },
+    "meta": {
+      "tags": "Tagged with",
+      "page": "Page"
+    }
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Pre-Order",
+      "sold_out": "Sold Out",
+      "unavailable": "Unavailable"
+    }
+  },
+  "sections": {
+    "header": {
+      "open_cart": "Open cart",
+      "open_navigation": "Open navigation"
+    }
+  }
+}

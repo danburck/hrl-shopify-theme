@@ -1,0 +1,151 @@
+{% comment %}
+  Product Detail Page — /products/seeker-black
+  Three-column layout (desktop):
+  Left:   Product name, price, description
+  Center: Image gallery + thumbnail selector
+  Right:  Variant selection + pre-order button
+
+  Mobile (top to bottom):
+  1. Product image gallery (swipeable)
+  2. Product name
+  3. Product price
+  4. Variant selector
+  5. Product info / description
+{% endcomment %}
+
+<article
+  class="product-page"
+  id="product-gallery"
+  itemscope
+  itemtype="http://schema.org/Product"
+>
+
+  <!-- LEFT: Info -->
+  <div class="product-page__info">
+    <h1 class="product-page__name" itemprop="name">{{ product.title }}</h1>
+
+    <p class="product-page__price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+      <span itemprop="price">{{ product.selected_or_first_available_variant.price | money }}</span>
+      <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
+    </p>
+
+    {%- if product.description != blank -%}
+      <div class="product-page__description" itemprop="description">
+        {{ product.description }}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <!-- CENTER: Gallery -->
+  <div class="product-page__gallery">
+
+    <!-- Main image view -->
+    <div class="product-page__main-image" data-images-container>
+      {%- for image in product.images -%}
+        <img
+          data-main-image="{{ forloop.index0 }}"
+          src="{{ image | image_url: width: 1200 }}"
+          alt="{{ image.alt | escape | default: product.title }}"
+          width="{{ image.width }}"
+          height="{{ image.height }}"
+          class="{%- if forloop.first -%}is-active{%- endif -%}"
+          loading="{%- if forloop.first -%}eager{%- else -%}lazy{%- endif -%}"
+          itemprop="image"
+        >
+      {%- endfor -%}
+    </div>
+
+    <!-- Thumbnail selector (desktop click / mobile swipe indicators) -->
+    {%- if product.images.size > 1 -%}
+      <div class="product-page__thumbnails" role="list" aria-label="Product image views">
+        {%- for image in product.images -%}
+          <button
+            class="product-page__thumb{%- if forloop.first %} is-active{%- endif -%}"
+            data-thumb="{{ forloop.index0 }}"
+            aria-label="View {{ forloop.index }}"
+            role="listitem"
+          >
+            <img
+              src="{{ image | image_url: width: 200 }}"
+              alt="{{ image.alt | escape }}"
+              width="200"
+              height="200"
+              loading="lazy"
+            >
+          </button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  <!-- RIGHT: Selection -->
+  <div class="product-page__selection">
+
+    {%- form 'product', product, id: 'product-form', data-product-form: '' -%}
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+      {%- if product.has_only_default_variant == false -%}
+        {%- for option in product.options_with_values -%}
+          <fieldset>
+            <legend class="product-page__variants-label">{{ option.name }}</legend>
+
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+              {%- for value in option.values -%}
+                <label class="product-page__variant-option{%- if option.selected_value == value %} is-selected{%- endif -%}">
+                  <input
+                    type="radio"
+                    name="{{ option.name }}"
+                    value="{{ value }}"
+                    {%- if option.selected_value == value -%}checked{%- endif -%}
+                    style="display: none;"
+                  >
+                  {{ value }}
+                </label>
+              {%- endfor -%}
+            </div>
+          </fieldset>
+        {%- endfor -%}
+      {%- endif -%}
+
+      <!-- Pre-order note -->
+      <p class="product-page__preorder-note">
+        Pre-order now — pick up at the HRL Release Event, May 2025.<br>
+        Limited to one per person.
+      </p>
+
+      <!-- Pre-order CTA -->
+      <button
+        type="submit"
+        name="add"
+        class="btn-preorder"
+        {%- if product.selected_or_first_available_variant.available == false -%}
+          disabled
+        {%- endif -%}
+      >
+        {%- if product.selected_or_first_available_variant.available -%}
+          Pre-Order
+        {%- else -%}
+          Sold Out
+        {%- endif -%}
+      </button>
+
+    {%- endform -%}
+
+    <!-- Out of stock policy note -->
+    {%- unless product.selected_or_first_available_variant.available -%}
+      <p class="text-warning text-red" style="margin-top: 8px;">
+        Out of stock items may be refunded
+      </p>
+    {%- endunless -%}
+
+  </div>
+
+</article>
+
+{% schema %}
+{
+  "name": "Product Template",
+  "settings": []
+}
+{% endschema %}

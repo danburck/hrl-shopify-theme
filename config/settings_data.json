@@ -1,0 +1,10 @@
+{
+  "current": {
+    "show_announcement": true,
+    "announcement_text": "OUT OF STOCK ITEMS MAY BE REFUNDED",
+    "color_yellow": "#fffb29",
+    "color_beige": "#faf9f6",
+    "color_black": "#101010",
+    "color_red": "#ff0004"
+  }
+}

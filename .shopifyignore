@@ -1,0 +1,6 @@
+local-dev/
+node_modules/
+.github/
+*.md
+package.json
+package-lock.json

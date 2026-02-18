@@ -1,0 +1,67 @@
+<!-- Cart Drawer Overlay -->
+<div
+  id="cart-drawer-overlay"
+  class="cart-drawer-overlay"
+  aria-hidden="true"
+></div>
+
+<!-- Cart Drawer -->
+<div
+  id="cart-drawer"
+  class="cart-drawer"
+  role="dialog"
+  aria-label="Shopping cart"
+  aria-modal="true"
+  aria-hidden="true"
+>
+  <div class="cart-drawer__header">
+    <h2 class="cart-drawer__title">Cart</h2>
+    <button
+      id="cart-drawer-close"
+      class="cart-drawer__close"
+      aria-label="Close cart"
+    >&#x2715;</button>
+  </div>
+
+  <div class="cart-drawer__body" id="cart-drawer-items">
+    {%- if cart.item_count == 0 -%}
+      <p class="cart-drawer__empty">Your cart is empty.</p>
+    {%- else -%}
+      {%- for item in cart.items -%}
+        <div class="cart-item" data-line-item="{{ item.key }}">
+          <img
+            class="cart-item__image"
+            src="{{ item.image | image_url: width: 160 }}"
+            alt="{{ item.title | escape }}"
+            width="80"
+            height="80"
+            loading="lazy"
+          >
+          <div class="cart-item__info">
+            <p class="cart-item__name">{{ item.product.title }}</p>
+            {%- if item.variant.title != 'Default Title' -%}
+              <p class="text-sm">{{ item.variant.title }}</p>
+            {%- endif -%}
+            <p class="cart-item__price">{{ item.final_line_price | money }}</p>
+            <p class="text-sm">Qty: {{ item.quantity }}</p>
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+
+  <div class="cart-drawer__footer">
+    {%- if cart.item_count > 0 -%}
+      <div class="flex justify-between items-center">
+        <span class="title title-md">Total</span>
+        <span class="text-md">{{ cart.total_price | money }}</span>
+      </div>
+      <p class="text-xs text-italic" style="margin-top: 4px; opacity: 0.6;">
+        Taxes and shipping calculated at checkout
+      </p>
+      <a href="/checkouts" class="btn-checkout">
+        Proceed to Checkout
+      </a>
+    {%- endif -%}
+  </div>
+</div>

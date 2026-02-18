@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>
+    {%- if page_title == blank -%}
+      {{ shop.name }}
+    {%- else -%}
+      {{ page_title }} — {{ shop.name }}
+    {%- endif -%}
+  </title>
+
+  {%- if page_description -%}
+    <meta name="description" content="{{ page_description | escape }}">
+  {%- endif -%}
+
+  {%- if settings.favicon != blank -%}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
+  {%- endif -%}
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="{{ canonical_url }}">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="{{ shop.name }}">
+  <meta property="og:url" content="{{ canonical_url }}">
+  <meta property="og:title" content="{{ page_title | escape }}">
+  <meta property="og:type" content="website">
+  {%- if page_description -%}
+    <meta property="og:description" content="{{ page_description | escape }}">
+  {%- endif -%}
+
+  <!-- Google Fonts: Istok Web + IM Fell DW Pica -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=Istok+Web:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Theme CSS -->
+  {{ 'theme.css' | asset_url | stylesheet_tag }}
+
+  <!-- Shopify required tags -->
+  {{ content_for_header }}
+</head>
+
+<body class="template-{{ template.name }}{% if template.suffix != blank %} template--{{ template.suffix }}{% endif %}">
+
+  <!-- Announcement Bar (scrolls with page) -->
+  {%- render 'announcement-bar' -%}
+
+  <!-- Site Header (sticky) -->
+  {%- render 'header' -%}
+
+  <!-- Cart Drawer -->
+  {%- render 'cart-drawer' -%}
+
+  <!-- Mobile Nav Drawer -->
+  {%- render 'mobile-nav-drawer' -%}
+
+  <!-- Mobile Cart Drawer -->
+  {%- render 'mobile-cart-drawer' -%}
+
+  <!-- Main Content -->
+  <main id="main-content" role="main" tabindex="-1">
+    {{ content_for_layout }}
+  </main>
+
+  <!-- Footer -->
+  {%- render 'footer' -%}
+
+  <!-- Theme JS -->
+  <script src="{{ 'theme.js' | asset_url }}" defer></script>
+
+</body>
+</html>

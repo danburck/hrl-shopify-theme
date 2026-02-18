@@ -1,0 +1,20 @@
+{
+  "name": "hrl-shopify-theme",
+  "version": "1.0.0",
+  "description": "Custom Shopify theme for Hyper Real Love — HRL pre-order shop",
+  "scripts": {
+    "dev": "node local-dev/server.js",
+    "shopify:dev": "shopify theme dev --store=YOUR_STORE.myshopify.com",
+    "shopify:push": "shopify theme push --store=YOUR_STORE.myshopify.com",
+    "shopify:pull": "shopify theme pull --store=YOUR_STORE.myshopify.com"
+  },
+  "dependencies": {
+    "liquidjs": "^10.0.0",
+    "chokidar": "^3.6.0",
+    "express": "^4.18.0",
+    "ws": "^8.14.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

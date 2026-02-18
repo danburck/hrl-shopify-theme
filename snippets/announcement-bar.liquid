@@ -1,0 +1,5 @@
+{%- if settings.announcement_text != blank and settings.show_announcement -%}
+  <div class="announcement-bar" role="region" aria-label="Announcement">
+    <p>{{ settings.announcement_text }}</p>
+  </div>
+{%- endif -%}

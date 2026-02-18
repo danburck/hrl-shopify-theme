@@ -1,0 +1,67 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer__inner">
+
+    <!-- Newsletter Signup -->
+    <div class="footer-newsletter">
+      <h2 class="footer-newsletter__title">Stay in the loop</h2>
+      <p class="footer-newsletter__subtitle">Notes on culture, energy and the things that matter.</p>
+
+      {%- form 'customer', id: 'footer-newsletter-form' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="footer-newsletter__form">
+          <input
+            type="email"
+            name="contact[email]"
+            class="footer-newsletter__input"
+            placeholder="your@email.com"
+            autocomplete="email"
+            required
+            aria-label="Email address"
+          >
+          <button type="submit" class="footer-newsletter__submit">
+            Join
+          </button>
+        </div>
+        {%- if form.posted_successfully? -%}
+          <p class="text-sm text-italic" style="margin-top: 8px; color: rgba(250,249,246,0.7);">
+            You're in. Welcome.
+          </p>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+
+    <!-- Footer Links -->
+    <div class="footer-links">
+
+      <div class="footer-links__group">
+        <p class="footer-links__group-title">Shop</p>
+        <a href="/">Products</a>
+        <a href="/products/seeker-black">Seeker Cap</a>
+        <a href="/policies/shipping-policy">Shipping</a>
+        <a href="/cart">Cart</a>
+      </div>
+
+      <div class="footer-links__group">
+        <p class="footer-links__group-title">Community</p>
+        <a href="/pages/journal-club">Journal Club</a>
+        <a href="/pages/manifesto">Manifesto</a>
+        <a href="/pages/faq">FAQ</a>
+        <a href="/pages/careers">Careers</a>
+      </div>
+
+      <div class="footer-links__group">
+        <p class="footer-links__group-title">Legal</p>
+        <a href="/pages/impressum">Impressum</a>
+        <a href="/pages/datenschutz">Datenschutz</a>
+        <a href="/pages/widerrufsbelehrung">Widerruf</a>
+        <a href="/policies/terms-of-service">AGB</a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="site-footer__bottom">
+    <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
+  </div>
+</footer>

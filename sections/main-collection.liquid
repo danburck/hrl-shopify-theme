@@ -1,0 +1,88 @@
+{% comment %}
+  Homepage — Product Grid
+  8 products shown; only first (seeker-black) is clickable.
+  Desktop: 4 columns × 2 rows
+  Mobile:  2 columns × 4 rows
+{% endcomment %}
+
+{%- assign active_product_handle = 'seeker-black' -%}
+
+<section class="main-collection" aria-label="Products">
+  <div class="product-grid">
+
+    {%- assign all_products = collections.all.products -%}
+
+    {%- comment -%} Render up to 8 product slots {%- endcomment -%}
+    {%- for i in (1..8) -%}
+
+      {%- assign product = all_products[forloop.index0] -%}
+
+      {%- if product != blank -%}
+
+        {%- assign is_active = false -%}
+        {%- if product.handle == active_product_handle -%}
+          {%- assign is_active = true -%}
+        {%- endif -%}
+
+        {%- if is_active -%}
+          <a
+            href="{{ product.url }}"
+            class="product-grid__item product-grid__item--active"
+            aria-label="{{ product.title }}"
+          >
+        {%- else -%}
+          <div
+            class="product-grid__item product-grid__item--locked"
+            aria-hidden="true"
+          >
+        {%- endif -%}
+
+          {%- if product.featured_image -%}
+            <img
+              class="product-grid__image"
+              src="{{ product.featured_image | image_url: width: 600 }}"
+              alt="{{ product.featured_image.alt | escape | default: product.title }}"
+              width="600"
+              height="800"
+              loading="{%- if forloop.index <= 2 -%}eager{%- else -%}lazy{%- endif -%}"
+            >
+          {%- else -%}
+            <div class="product-grid__image" style="background: rgba(16,16,16,0.06);"></div>
+          {%- endif -%}
+
+          {%- unless is_active -%}
+            <div class="product-grid__hidden-overlay">
+              <span class="product-grid__hidden-label">Coming Soon</span>
+            </div>
+          {%- endunless -%}
+
+          {%- if is_active -%}
+            <div class="product-grid__info">
+              <p class="product-grid__name">{{ product.title }}</p>
+            </div>
+          {%- endif -%}
+
+        {%- if is_active -%}</a>{%- else -%}</div>{%- endif -%}
+
+      {%- else -%}
+
+        {%- comment -%} Empty locked slot {%- endcomment -%}
+        <div class="product-grid__item product-grid__item--locked" aria-hidden="true">
+          <div class="product-grid__hidden-overlay">
+            <span class="product-grid__hidden-label">Coming Soon</span>
+          </div>
+        </div>
+
+      {%- endif -%}
+
+    {%- endfor -%}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product Grid",
+  "settings": []
+}
+{% endschema %}

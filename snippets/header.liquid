@@ -1,0 +1,71 @@
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+
+    <!-- MOBILE: Blurb (left) acts as nav toggle -->
+    <button
+      id="mobile-nav-toggle"
+      class="site-header__blurb nav-mobile-toggle"
+      aria-label="Open navigation"
+      aria-controls="mobile-nav-drawer"
+      aria-expanded="false"
+    >
+      <div class="blurb">
+        <div class="blurb__rays"></div>
+        <div class="blurb__glow"></div>
+        <div class="blurb__core"></div>
+      </div>
+    </button>
+
+    <!-- DESKTOP: Blurb (center) — decorative + links to homepage -->
+    <div class="site-header__blurb" aria-hidden="true">
+      <div class="blurb">
+        <div class="blurb__rays"></div>
+        <div class="blurb__glow"></div>
+        <div class="blurb__core"></div>
+      </div>
+    </div>
+
+    <!-- Logo (left on desktop, center on mobile) -->
+    <div class="site-header__logo">
+      <a href="https://hyperreallove.com" aria-label="{{ shop.name }} — go to main site">
+        {%- if settings.logo != blank -%}
+          <img
+            src="{{ settings.logo | image_url: width: 120 }}"
+            alt="{{ shop.name }}"
+            width="120"
+            height="28"
+            loading="eager"
+          >
+        {%- else -%}
+          <span class="title title-md text-beige">HRL</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+    <!-- Desktop Navigation (right) -->
+    <nav class="site-header__nav" aria-label="Main navigation">
+      <a href="/pages/journal-club" class="text-italic">Journal Club</a>
+
+      <!-- Cart (desktop) -->
+      <button
+        class="cart-toggle"
+        data-cart-toggle
+        aria-label="Open cart"
+        aria-controls="cart-drawer"
+        aria-expanded="false"
+      >
+        <span class="cart-toggle__desktop-label">Cart <span data-cart-count></span></span>
+      </button>
+    </nav>
+
+    <!-- Mobile: Cart count (right) -->
+    <button
+      id="mobile-cart-toggle"
+      class="cart-toggle"
+      aria-label="Open cart"
+    >
+      <span class="cart-toggle__mobile-label text-beige" data-cart-count></span>
+    </button>
+
+  </div>
+</header>
