@@ -1,71 +1,60 @@
+<!-- Sticky black nav bar — sticks at top once announcement bar scrolls away -->
 <header class="site-header" role="banner">
   <div class="site-header__inner">
 
-    <!-- MOBILE: Blurb (left) acts as nav toggle -->
+    <!-- ── DESKTOP LEFT / MOBILE CENTER : HRL Logo ── -->
+    <div class="site-header__logo">
+      <a href="{{ settings.main_site_url | default: '/' }}" aria-label="{{ shop.name }} — go to main site">
+        <img
+          src="{{ 'HRL_logo.svg' | asset_url }}"
+          alt="{{ shop.name }}"
+          class="site-header__logo-img"
+          width="108"
+          height="53"
+          loading="eager"
+        >
+      </a>
+    </div>
+
+    <!-- ── CENTER : Yellow Blurb ── -->
+    <!-- Desktop: decorative/alive, pointer-events none -->
+    <!-- Mobile: tappable — opens nav drawer -->
     <button
       id="mobile-nav-toggle"
-      class="site-header__blurb nav-mobile-toggle"
+      class="site-header__blurb"
       aria-label="Open navigation"
       aria-controls="mobile-nav-drawer"
       aria-expanded="false"
     >
-      <div class="blurb">
-        <div class="blurb__rays"></div>
-        <div class="blurb__glow"></div>
-        <div class="blurb__core"></div>
-      </div>
+      <img
+        src="{{ 'yellow_blurb.svg' | asset_url }}"
+        alt=""
+        class="blurb__svg"
+        width="70"
+        height="70"
+        aria-hidden="true"
+        draggable="false"
+      >
     </button>
 
-    <!-- DESKTOP: Blurb (center) — decorative + links to homepage -->
-    <div class="site-header__blurb" aria-hidden="true">
-      <div class="blurb">
-        <div class="blurb__rays"></div>
-        <div class="blurb__glow"></div>
-        <div class="blurb__core"></div>
-      </div>
-    </div>
-
-    <!-- Logo (left on desktop, center on mobile) -->
-    <div class="site-header__logo">
-      <a href="https://hyperreallove.com" aria-label="{{ shop.name }} — go to main site">
-        {%- if settings.logo != blank -%}
-          <img
-            src="{{ settings.logo | image_url: width: 120 }}"
-            alt="{{ shop.name }}"
-            width="120"
-            height="28"
-            loading="eager"
-          >
-        {%- else -%}
-          <span class="title title-md text-beige">HRL</span>
-        {%- endif -%}
-      </a>
-    </div>
-
-    <!-- Desktop Navigation (right) -->
+    <!-- ── DESKTOP RIGHT : nav links + cart ── -->
     <nav class="site-header__nav" aria-label="Main navigation">
-      <a href="/pages/journal-club" class="text-italic">Journal Club</a>
-
-      <!-- Cart (desktop) -->
+      <a href="/pages/journal-club" class="nav-link">Journal Club</a>
       <button
-        class="cart-toggle"
+        class="nav-link cart-toggle"
         data-cart-toggle
         aria-label="Open cart"
         aria-controls="cart-drawer"
         aria-expanded="false"
-      >
-        <span class="cart-toggle__desktop-label">Cart <span data-cart-count></span></span>
-      </button>
+      >Cart <span data-cart-count>(0)</span></button>
     </nav>
 
-    <!-- Mobile: Cart count (right) -->
+    <!-- ── MOBILE RIGHT : cart count only, e.g. "(1)" ── -->
     <button
       id="mobile-cart-toggle"
-      class="cart-toggle"
+      class="site-header__mobile-cart nav-link"
       aria-label="Open cart"
-    >
-      <span class="cart-toggle__mobile-label text-beige" data-cart-count></span>
-    </button>
+    ><span data-cart-count>(0)</span></button>
 
   </div>
 </header>

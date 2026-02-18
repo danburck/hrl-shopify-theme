@@ -79,12 +79,12 @@ function getMockData(route = '/') {
       }
     ],
     images: [
-      { src: 'https://via.placeholder.com/800x1000/101010/faf9f6?text=CAP+FRONT',  alt: 'Seeker Cap — Front',  width: 800, height: 1000 },
-      { src: 'https://via.placeholder.com/800x1000/101010/faf9f6?text=CAP+SIDE',   alt: 'Seeker Cap — Side',   width: 800, height: 1000 },
-      { src: 'https://via.placeholder.com/800x1000/101010/faf9f6?text=CAP+BACK',   alt: 'Seeker Cap — Back',   width: 800, height: 1000 },
-      { src: 'https://via.placeholder.com/800x1000/101010/faf9f6?text=CAP+DETAIL', alt: 'Seeker Cap — Detail', width: 800, height: 1000 },
+      { src: '/assets/cap-front.webp',  alt: 'Seeker Cap — Front',  width: 800, height: 1000 },
+      { src: '/assets/cap-side.webp',   alt: 'Seeker Cap — Side',   width: 800, height: 1000 },
+      { src: '/assets/cap-back.webp',   alt: 'Seeker Cap — Back',   width: 800, height: 1000 },
+      { src: '/assets/cap-detail.webp', alt: 'Seeker Cap — Detail', width: 800, height: 1000 },
     ],
-    featured_image: { src: 'https://via.placeholder.com/600x800/101010/faf9f6?text=SEEKER', alt: 'Seeker Cap' },
+    featured_image: { src: '/assets/cap-front.webp', alt: 'Seeker Cap — Front' },
     selected_or_first_available_variant: {
       id: 101,
       title: 'Modern Monk',
@@ -93,19 +93,31 @@ function getMockData(route = '/') {
     },
   };
 
-  const hiddenProduct = (i) => ({
-    id: i,
-    title: 'COMING SOON',
-    handle: `hidden-${i}`,
+  /* Row 1 locked slots */
+  const lockedNames = ['OBSERVER', 'PREACHER', 'LOVER'];
+  const lockedProduct = (i) => ({
+    id: i + 10,
+    title: lockedNames[i - 1] || '???',
+    handle: `locked-${i}`,
     url: '#',
-    featured_image: { src: `https://via.placeholder.com/600x800/1a1a1a/333333?text=`, alt: '' },
+    featured_image: { src: '/assets/cap-hidden.webp', alt: '' },
+    selected_or_first_available_variant: { available: false, price: 0 },
+  });
+
+  /* Row 2 deep-locked slots — use same hidden cap image */
+  const deepProduct = (i) => ({
+    id: i + 20,
+    title: '???',
+    handle: `deep-${i}`,
+    url: '#',
+    featured_image: { src: '/assets/cap-hidden.webp', alt: '' },
     selected_or_first_available_variant: { available: false, price: 0 },
   });
 
   const allProducts = [
     seekerProduct,
-    hiddenProduct(2), hiddenProduct(3), hiddenProduct(4),
-    hiddenProduct(5), hiddenProduct(6), hiddenProduct(7), hiddenProduct(8),
+    lockedProduct(1), lockedProduct(2), lockedProduct(3),
+    deepProduct(1), deepProduct(2), deepProduct(3), deepProduct(4),
   ];
 
   const cart = { item_count: 0, items: [], total_price: 0, currency: { iso_code: 'EUR' } };
@@ -113,6 +125,7 @@ function getMockData(route = '/') {
   const settings = {
     show_announcement: true,
     announcement_text: 'OUT OF STOCK ITEMS MAY BE REFUNDED',
+    main_site_url: 'http://localhost:3000', /* → hyperreallove.com on Shopify */
     logo: null,
     favicon: null,
   };
@@ -154,6 +167,21 @@ function getMockData(route = '/') {
   };
 }
 
+/* ---- Strip / shim Shopify-only tags that LiquidJS doesn't understand ---- */
+function stripShopifyTags(src) {
+  return src
+    // Remove {% schema %}...{% endschema %} blocks
+    .replace(/\{%-?\s*schema\s*-?%\}[\s\S]*?\{%-?\s*endschema\s*-?%\}/g, '')
+    // Remove {% stylesheet %}...{% endstylesheet %} blocks
+    .replace(/\{%-?\s*stylesheet\s*-?%\}[\s\S]*?\{%-?\s*endstylesheet\s*-?%\}/g, '')
+    // Remove {% javascript %}...{% endjavascript %} blocks
+    .replace(/\{%-?\s*javascript\s*-?%\}[\s\S]*?\{%-?\s*endjavascript\s*-?%\}/g, '')
+    // Replace {% form '...' %} with a plain <form> (Shopify-specific tag)
+    .replace(/\{%-?\s*form\s+[^%]*-?%\}/g, '<form>')
+    // Replace {% endform %} with </form>
+    .replace(/\{%-?\s*endform\s*-?%\}/g, '</form>');
+}
+
 /* ---- Render Liquid layout with section content ---- */
 async function renderPage(route) {
   const data = getMockData(route);
@@ -170,21 +198,20 @@ async function renderPage(route) {
 
   let sectionHtml = '';
   if (sectionFile && fs.existsSync(sectionFile)) {
-    sectionHtml = await engine.renderFile(
-      path.relative(path.join(ROOT, 'sections'), sectionFile).replace('.liquid', ''),
-      data
-    );
+    // Read, strip Shopify tags, then parse+render
+    const sectionSrc = stripShopifyTags(fs.readFileSync(sectionFile, 'utf8'));
+    sectionHtml = await engine.parseAndRender(sectionSrc, data);
   }
 
   data['content_for_layout'] = sectionHtml;
 
   const layoutFile = path.join(ROOT, 'layout', 'theme.liquid');
-  const layoutSrc  = fs.readFileSync(layoutFile, 'utf8')
+  const layoutSrc  = stripShopifyTags(fs.readFileSync(layoutFile, 'utf8'))
     // Replace render tags with actual file contents for snippets
     .replace(/\{%-?\s*render\s+'([^']+)'\s*-?%\}/g, (_, name) => {
       const snippetPath = path.join(ROOT, 'snippets', `${name}.liquid`);
       return fs.existsSync(snippetPath)
-        ? fs.readFileSync(snippetPath, 'utf8')
+        ? stripShopifyTags(fs.readFileSync(snippetPath, 'utf8'))
         : `<!-- snippet ${name} not found -->`;
     });
 
@@ -192,6 +219,12 @@ async function renderPage(route) {
 }
 
 /* ---- Routes ---- */
+
+/* Mock Shopify AJAX cart endpoint — keeps cart JS happy in local dev */
+app.get('/cart.js', (req, res) => {
+  res.json({ item_count: 0, items: [], total_price: 0 });
+});
+
 app.get('/', async (req, res) => {
   try {
     const html = await renderPage('/');

@@ -47,10 +47,10 @@
 
 <body class="template-{{ template.name }}{% if template.suffix != blank %} template--{{ template.suffix }}{% endif %}">
 
-  <!-- Announcement Bar (scrolls with page) -->
+  <!-- Announcement bar: normal flow, scrolls away with page -->
   {%- render 'announcement-bar' -%}
 
-  <!-- Site Header (sticky) -->
+  <!-- Sticky nav header: sticks at top once announcement scrolls away -->
   {%- render 'header' -%}
 
   <!-- Cart Drawer -->

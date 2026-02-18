@@ -45,7 +45,7 @@
   --space-20: 80px;
 
   /* Layout */
-  --header-height: 56px;
+  --header-height: 80px; /* +24px to clear the yellow blob */
   --announcement-height: 36px;
   --max-width: 1440px;
   --content-padding-x: 24px;
@@ -198,7 +198,7 @@ ul, ol {
    ------------------------------------------------------------ */
 .announcement-bar {
   background-color: var(--color-red);
-  color: var(--color-beige);
+  color: var(--color-yellow);           /* yellow text on red */
   height: var(--announcement-height);
   display: flex;
   align-items: center;
@@ -209,7 +209,7 @@ ul, ol {
   font-size: var(--text-sm);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  /* scrolls with the page */
+  /* scrolls with the page — disappears naturally on scroll */
   position: relative;
   z-index: var(--z-announcement);
 }
@@ -217,14 +217,14 @@ ul, ol {
 /* ------------------------------------------------------------
    7. HEADER / NAVIGATION
    ------------------------------------------------------------ */
+
+/* The <header> is the sticky nav bar — announcement bar is a sibling before it */
 .site-header {
   position: sticky;
   top: 0;
   z-index: var(--z-header);
   background-color: var(--color-black);
   height: var(--header-height);
-  display: flex;
-  align-items: center;
 }
 
 .site-header__inner {
@@ -232,24 +232,25 @@ ul, ol {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: var(--max-width);
-  margin-inline: auto;
-  padding-inline: var(--content-padding-x);
+  /* no max-width — logo and nav hug the viewport edges */
+  padding-inline: 20px;
   height: 100%;
+  position: relative; /* for absolute blurb centering */
 }
 
-/* Logo */
+/* ── Logo ── */
 .site-header__logo a {
   display: flex;
   align-items: center;
 }
 
-.site-header__logo img {
-  height: 28px;
+.site-header__logo-img {
+  height: 41px; /* 26px × 1.58313853 */
   width: auto;
+  display: block;
 }
 
-/* Yellow Blurb — center element */
+/* ── Yellow Blurb — absolutely centered on desktop ── */
 .site-header__blurb {
   position: absolute;
   left: 50%;
@@ -257,133 +258,70 @@ ul, ol {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: default;       /* not clickable on desktop */
+  pointer-events: none;  /* desktop: purely decorative */
 }
 
-.blurb {
-  width: 32px;
-  height: 32px;
-  position: relative;
-  transition: transform var(--transition-base);
-}
-
-.blurb:hover {
-  transform: scale(1.15);
-}
-
-/* Flame/sun flicker animation */
-.blurb__core {
-  position: absolute;
-  inset: 25%;
-  background: var(--color-yellow);
-  border-radius: 50%;
-  filter: blur(2px);
-}
-
-.blurb__glow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    ellipse at center,
-    var(--color-yellow) 0%,
-    rgba(255, 251, 41, 0.6) 40%,
-    rgba(255, 251, 41, 0) 70%
-  );
-  border-radius: 50%;
+/* The SVG image — flame flicker animation */
+.blurb__svg {
+  width: 70px;  /* 44px × 1.58 */
+  height: 70px;
+  display: block;
   animation: blurb-flicker 3s ease-in-out infinite;
   transform-origin: center;
 }
 
-.blurb__rays {
-  position: absolute;
-  inset: -4px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 251, 41, 0.3) 0%,
-    rgba(255, 251, 41, 0.1) 50%,
-    rgba(255, 251, 41, 0) 70%
-  );
-  border-radius: 50%;
-  animation: blurb-pulse 2.4s ease-in-out infinite alternate;
+/* Hover: grow (applies on mobile where pointer-events are on) */
+.site-header__blurb:hover .blurb__svg {
+  animation: blurb-flicker-fast 1.5s ease-in-out infinite;
 }
 
 @keyframes blurb-flicker {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-  20% {
-    transform: scale(1.05) rotate(1deg);
-    opacity: 0.92;
-  }
-  40% {
-    transform: scale(0.97) rotate(-0.5deg);
-    opacity: 0.98;
-  }
-  60% {
-    transform: scale(1.03) rotate(1.5deg);
-    opacity: 0.94;
-  }
-  80% {
-    transform: scale(0.99) rotate(-1deg);
-    opacity: 0.97;
-  }
+  0%, 100% { transform: scale(1);    opacity: 1;    }
+  15%       { transform: scale(1.06) rotate(1.2deg);  opacity: 0.9;  }
+  30%       { transform: scale(0.96) rotate(-0.8deg); opacity: 0.97; }
+  50%       { transform: scale(1.04) rotate(1.5deg);  opacity: 0.92; }
+  70%       { transform: scale(0.98) rotate(-0.5deg); opacity: 0.96; }
+  85%       { transform: scale(1.03) rotate(0.8deg);  opacity: 0.94; }
 }
 
-@keyframes blurb-pulse {
-  0%   { transform: scale(0.92); opacity: 0.7; }
-  100% { transform: scale(1.1);  opacity: 1; }
+@keyframes blurb-flicker-fast {
+  0%, 100% { transform: scale(1.1);    opacity: 1;    }
+  25%       { transform: scale(1.18) rotate(1.5deg);  opacity: 0.9;  }
+  50%       { transform: scale(1.06) rotate(-1deg);   opacity: 0.95; }
+  75%       { transform: scale(1.15) rotate(1deg);    opacity: 0.92; }
 }
 
-/* Desktop Navigation */
+/* ── Nav links (shared style) ── */
+.nav-link {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: var(--text-md);
+  color: var(--color-yellow);   /* yellow, per Figma */
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity var(--transition-fast);
+  white-space: nowrap;
+}
+
+.nav-link:hover { opacity: 0.55; }
+
+/* ── Desktop nav ── */
 .site-header__nav {
   display: flex;
   align-items: center;
   gap: var(--space-6);
 }
 
-.site-header__nav a,
-.site-header__nav button {
-  font-family: var(--font-body);
-  font-style: italic;
-  font-size: var(--text-md);
-  color: var(--color-beige);
-  text-decoration: none;
-  transition: opacity var(--transition-fast);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.site-header__nav a:hover,
-.site-header__nav button:hover {
-  opacity: 0.6;
-}
-
-/* Cart button */
-.cart-toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-family: var(--font-body);
-  font-style: italic;
-  font-size: var(--text-md);
-  color: var(--color-beige);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: opacity var(--transition-fast);
-}
-
-.cart-toggle:hover { opacity: 0.6; }
-
-/* Mobile: show only cart count */
-.cart-toggle__mobile-label { display: none; }
-
-/* Mobile nav toggle (hamburger via blurb) */
-.nav-mobile-toggle {
-  display: none;
+/* ── Mobile cart (right slot) ── */
+.site-header__mobile-cart {
+  display: none;  /* shown only on mobile via media query */
 }
 
 /* ------------------------------------------------------------
@@ -674,83 +612,132 @@ ul, ol {
 /* ------------------------------------------------------------
    11. PRODUCT GRID (Homepage)
    ------------------------------------------------------------ */
+
+/* Homepage body background: black */
+.template-index {
+  background: var(--color-black);
+}
+
+.main-collection {
+  padding: 100px 100px 0; /* top + sides on desktop; no bottom (grid bleeds to footer) */
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  /* tagline row is a named track so it spans all 4 columns */
   gap: 0;
 }
 
-.product-grid__item {
-  position: relative;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
-  background: rgba(16, 16, 16, 0.04);
-}
-
-.product-grid__item--locked {
+/* ── Base card ── */
+.product-card {
+  display: block;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-decoration: none;
   cursor: default;
 }
 
-.product-grid__item--active {
+/* ── Active card: full brightness, yellow text, pointer ── */
+.product-card--active {
   cursor: pointer;
 }
 
-.product-grid__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* Subtle scale on hover for the active card only */
+.product-card--active .product-card__image {
   transition: transform var(--transition-slow);
 }
-
-.product-grid__item--active:hover .product-grid__image {
+.product-card--active:hover .product-card__image {
   transform: scale(1.03);
 }
 
-/* Hidden product overlay */
-.product-grid__hidden-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(16, 16, 16, 0.85);
+/* ── Locked cards (row 1 non-active): ~30% image opacity ── */
+.product-card--locked .product-card__image-wrap {
+  opacity: 0.30;
+}
+
+/* ── Deep locked cards (row 2): ~15% image opacity ── */
+.product-card--deep .product-card__image-wrap {
+  opacity: 0.15;
+}
+
+/* ── Image wrapper — cap is 40% of the card width, centred ── */
+.product-card__image-wrap {
+  width: 40%;
+  margin: 0 auto;
+  aspect-ratio: 3 / 4;
+  /* overflow must be visible so the hover scale isn't clipped */
+  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
+  transition: opacity var(--transition-base);
 }
 
-.product-grid__hidden-label {
-  font-family: var(--font-body);
-  font-style: italic;
-  color: rgba(250, 249, 246, 0.4);
-  font-size: var(--text-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
+/* ── Product image: contain so cap floats on black ── */
+.product-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  /* scale origin centre; transform-origin already defaults to 50% 50% */
 }
 
-/* Product card hover info */
-.product-grid__info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: var(--space-4) var(--space-5);
-  background: linear-gradient(to top, rgba(16,16,16,0.7) 0%, transparent 100%);
-  opacity: 0;
-  transform: translateY(8px);
-  transition: all var(--transition-base);
+.product-card__image--empty {
+  width: 100%;
+  height: 100%;
+  background: transparent;
 }
 
-.product-grid__item--active:hover .product-grid__info {
-  opacity: 1;
-  transform: translateY(0);
+/* ── Name + price: always visible below the image, centred ── */
+.product-card__info {
+  padding: var(--space-3) var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  text-align: center;
 }
 
-.product-grid__name {
+.product-card__name {
   font-family: var(--font-title);
   font-weight: 700;
-  font-size: var(--text-title-md);
+  font-size: var(--text-title-sm);
   text-transform: uppercase;
   letter-spacing: var(--title-letter-spacing);
-  color: var(--color-beige);
+  color: var(--color-yellow);
+  line-height: 1.1;
+}
+
+/* Locked: mute name text */
+.product-card--locked .product-card__name,
+.product-card--deep .product-card__name {
+  color: rgba(255, 251, 41, 0.25);
+}
+
+.product-card__price {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: var(--text-sm);
+  color: rgba(255, 251, 41, 0.6);
+}
+
+/* Locked: mute price text */
+.product-card--locked .product-card__price,
+.product-card--deep .product-card__price {
+  color: rgba(255, 251, 41, 0.15);
+}
+
+/* ── Tagline: full-width row between the two product rows ── */
+.product-grid__tagline {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding-block: var(--space-8);
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 251, 41, 0.55);
+  letter-spacing: 0.01em;
 }
 
 /* ------------------------------------------------------------
@@ -1024,47 +1011,56 @@ ul, ol {
 @media (max-width: 768px) {
   :root {
     --content-padding-x: 16px;
-    --header-height: 52px;
+    --header-height: 76px; /* +24px to match desktop increase */
   }
 
-  /* Header mobile layout:
-     blurb (left) | logo (center) | cart count (right) */
-  .site-header__inner {
-    position: relative;
-  }
+  /* ── Mobile header layout: blurb(L) | HRL(C) | cart(R) ── */
 
-  /* Move blurb to left */
+  /* Blurb: move from absolute-center to static left slot */
   .site-header__blurb {
     position: static;
     transform: none;
-    order: -1;
+    pointer-events: all;  /* tappable on mobile */
+    cursor: pointer;
+    order: 0;
   }
 
-  /* Logo centered absolutely */
+  /* Logo: absolute center */
   .site-header__logo {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
   }
 
-  /* Hide desktop nav, show mobile toggle */
+  /* Hide desktop nav */
   .site-header__nav {
     display: none;
   }
 
-  .nav-mobile-toggle {
+  /* Show mobile cart count on the right */
+  .site-header__mobile-cart {
     display: flex;
     align-items: center;
-    cursor: pointer;
   }
-
-  /* Show "(1)" only on mobile */
-  .cart-toggle__desktop-label { display: none; }
-  .cart-toggle__mobile-label  { display: block; }
 
   /* Product grid: 2 columns on mobile */
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Collapse the 100px desktop padding on mobile */
+  .main-collection {
+    padding: 32px 16px 0;
+  }
+
+  /* Slightly larger caps on mobile (only 2 cols, more room) */
+  .product-card__image-wrap {
+    width: 55%;
+  }
+
+  .product-grid__tagline {
+    padding-block: var(--space-6);
+    font-size: 0.9rem;
   }
 
   /* Product detail: single column stack */

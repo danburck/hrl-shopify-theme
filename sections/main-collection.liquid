@@ -1,80 +1,83 @@
 {% comment %}
   Homepage — Product Grid
-  8 products shown; only first (seeker-black) is clickable.
-  Desktop: 4 columns × 2 rows
-  Mobile:  2 columns × 4 rows
+  8 slots: only SEEKER (row 1, col 1) is active/clickable.
+  Desktop: 4 columns × 2 rows with tagline spanning full width between rows.
+  Mobile:  2 columns × 4 rows.
+  Active product: full opacity, yellow text.
+  Locked products: dimmed image + muted text.
 {% endcomment %}
 
-{%- assign active_product_handle = 'seeker-black' -%}
+{%- assign active_handle = 'seeker-black' -%}
+{%- assign all_products = collections.all.products -%}
 
 <section class="main-collection" aria-label="Products">
   <div class="product-grid">
 
-    {%- assign all_products = collections.all.products -%}
+    {%- comment -%}── ROW 1 (slots 1–4) ──{%- endcomment -%}
+    {%- for i in (0..3) -%}
+      {%- assign product = all_products[i] -%}
+      {%- assign is_active = false -%}
+      {%- if product.handle == active_handle -%}{%- assign is_active = true -%}{%- endif -%}
 
-    {%- comment -%} Render up to 8 product slots {%- endcomment -%}
-    {%- for i in (1..8) -%}
+      {%- if is_active -%}
+        <a href="{{ product.url }}" class="product-card product-card--active" aria-label="{{ product.title }}">
+      {%- else -%}
+        <div class="product-card product-card--locked" aria-hidden="true">
+      {%- endif -%}
 
-      {%- assign product = all_products[forloop.index0] -%}
-
-      {%- if product != blank -%}
-
-        {%- assign is_active = false -%}
-        {%- if product.handle == active_product_handle -%}
-          {%- assign is_active = true -%}
-        {%- endif -%}
-
-        {%- if is_active -%}
-          <a
-            href="{{ product.url }}"
-            class="product-grid__item product-grid__item--active"
-            aria-label="{{ product.title }}"
-          >
-        {%- else -%}
-          <div
-            class="product-grid__item product-grid__item--locked"
-            aria-hidden="true"
-          >
-        {%- endif -%}
-
+        <div class="product-card__image-wrap">
           {%- if product.featured_image -%}
             <img
-              class="product-grid__image"
+              class="product-card__image"
               src="{{ product.featured_image | image_url: width: 600 }}"
               alt="{{ product.featured_image.alt | escape | default: product.title }}"
               width="600"
-              height="800"
-              loading="{%- if forloop.index <= 2 -%}eager{%- else -%}lazy{%- endif -%}"
+              height="700"
+              loading="{%- if i == 0 -%}eager{%- else -%}lazy{%- endif -%}"
             >
           {%- else -%}
-            <div class="product-grid__image" style="background: rgba(16,16,16,0.06);"></div>
+            <div class="product-card__image product-card__image--empty"></div>
           {%- endif -%}
-
-          {%- unless is_active -%}
-            <div class="product-grid__hidden-overlay">
-              <span class="product-grid__hidden-label">Coming Soon</span>
-            </div>
-          {%- endunless -%}
-
-          {%- if is_active -%}
-            <div class="product-grid__info">
-              <p class="product-grid__name">{{ product.title }}</p>
-            </div>
-          {%- endif -%}
-
-        {%- if is_active -%}</a>{%- else -%}</div>{%- endif -%}
-
-      {%- else -%}
-
-        {%- comment -%} Empty locked slot {%- endcomment -%}
-        <div class="product-grid__item product-grid__item--locked" aria-hidden="true">
-          <div class="product-grid__hidden-overlay">
-            <span class="product-grid__hidden-label">Coming Soon</span>
-          </div>
         </div>
 
-      {%- endif -%}
+        <div class="product-card__info">
+          <p class="product-card__name">{{ product.title }}</p>
+          <p class="product-card__price">{{ product.selected_or_first_available_variant.price | money }}</p>
+        </div>
 
+      {%- if is_active -%}</a>{%- else -%}</div>{%- endif -%}
+    {%- endfor -%}
+
+    {%- comment -%}── TAGLINE spanning all 4 columns ──{%- endcomment -%}
+    <div class="product-grid__tagline" aria-hidden="true">
+      <em>which one are you right now?</em>
+    </div>
+
+    {%- comment -%}── ROW 2 (slots 5–8) — all locked ──{%- endcomment -%}
+    {%- for i in (4..7) -%}
+      {%- assign product = all_products[i] -%}
+
+      <div class="product-card product-card--locked product-card--deep" aria-hidden="true">
+        <div class="product-card__image-wrap">
+          {%- if product.featured_image -%}
+            <img
+              class="product-card__image"
+              src="{{ product.featured_image | image_url: width: 600 }}"
+              alt=""
+              width="600"
+              height="700"
+              loading="lazy"
+            >
+          {%- else -%}
+            <div class="product-card__image product-card__image--empty"></div>
+          {%- endif -%}
+        </div>
+
+        <div class="product-card__info">
+          <p class="product-card__name">{{ product.title }}</p>
+          <p class="product-card__price">{{ product.selected_or_first_available_variant.price | money }}</p>
+        </div>
+      </div>
     {%- endfor -%}
 
   </div>

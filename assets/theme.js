@@ -204,10 +204,10 @@ function closeDrawer(drawerEl, overlayEl) {
         const count = cart.item_count || 0;
         const countEls = document.querySelectorAll('[data-cart-count]');
         countEls.forEach(el => {
-          el.textContent = count > 0 ? `(${count})` : '';
+          el.textContent = `(${count})`; /* always show count, e.g. "(0)" */
         });
       })
-      .catch(() => {/* silently fail in local dev */});
+      .catch(() => {/* silently fail in local dev — HTML default "(0)" shows */});
   }
 
   // Update on page load
