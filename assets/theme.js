@@ -124,22 +124,17 @@ function closeDrawer(drawerEl, overlayEl) {
    Product Image Gallery — Desktop thumbnail switcher
    ------------------------------------------------------------ */
 (function initProductGallery() {
-  const gallery    = document.getElementById('product-gallery');
+  const gallery    = document.getElementById('product-page');
   if (!gallery) return;
 
-  const mainImages = gallery.querySelectorAll('[data-main-image]');
+  const slides     = gallery.querySelectorAll('[data-main-image]'); /* now slide divs */
   const thumbs     = gallery.querySelectorAll('[data-thumb]');
 
-  if (!mainImages.length || !thumbs.length) return;
+  if (!slides.length || !thumbs.length) return;
 
   function switchImage(index) {
-    // Fade out current
-    mainImages.forEach((img, i) => {
-      img.classList.toggle('is-active', i === index);
-    });
-    thumbs.forEach((thumb, i) => {
-      thumb.classList.toggle('is-active', i === index);
-    });
+    slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
+    thumbs.forEach((thumb, i) => thumb.classList.toggle('is-active', i === index));
   }
 
   thumbs.forEach((thumb, i) => {
@@ -151,45 +146,109 @@ function closeDrawer(drawerEl, overlayEl) {
 })();
 
 /* ------------------------------------------------------------
-   Product Image Gallery — Mobile swipe
+   Product Image Gallery — Mobile drag carousel + arrows
    ------------------------------------------------------------ */
 (function initMobileSwipe() {
-  const gallery = document.getElementById('product-gallery');
+  const gallery   = document.getElementById('product-page');
   if (!gallery) return;
 
-  const mainImagesContainer = gallery.querySelector('[data-images-container]');
-  if (!mainImagesContainer) return;
+  const container = gallery.querySelector('[data-images-container]');
+  const images    = gallery.querySelectorAll('[data-main-image]');
+  if (!container || images.length <= 1) return;
 
-  const images = gallery.querySelectorAll('[data-main-image]');
-  if (images.length <= 1) return;
+  const prevBtn = gallery.querySelector('[data-nav-prev]');
+  const nextBtn = gallery.querySelector('[data-nav-next]');
+
+  const isMobile = () => window.innerWidth <= 768;
 
   let currentIndex = 0;
-  let startX = 0;
-  let isDragging = false;
 
-  mainImagesContainer.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-    isDragging = true;
+  /* Slide to a given index with optional animation */
+  function goTo(index, animate = true) {
+    currentIndex = Math.max(0, Math.min(index, images.length - 1));
+
+    container.style.transition = animate
+      ? 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+      : 'none';
+    container.style.transform = `translateX(${-currentIndex * 100}%)`;
+
+    /* Keep thumbnail strip in sync */
+    gallery.querySelectorAll('[data-thumb]').forEach((t, i) =>
+      t.classList.toggle('is-active', i === currentIndex)
+    );
+
+    /* Dim arrow at first / last image */
+    if (prevBtn) prevBtn.style.opacity = currentIndex === 0              ? '0.25' : '1';
+    if (nextBtn) nextBtn.style.opacity = currentIndex === images.length - 1 ? '0.25' : '1';
+  }
+
+  /* Arrow button clicks */
+  if (prevBtn) prevBtn.addEventListener('click', () => { if (isMobile()) goTo(currentIndex - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { if (isMobile()) goTo(currentIndex + 1); });
+
+  /* ── Drag / swipe ── */
+  let startX      = 0;
+  let startY      = 0;
+  let dragDelta   = 0;
+  let isHoriz     = null; /* null = undecided, true = horizontal, false = vertical */
+
+  container.addEventListener('touchstart', e => {
+    if (!isMobile()) return;
+    startX    = e.touches[0].clientX;
+    startY    = e.touches[0].clientY;
+    dragDelta = 0;
+    isHoriz   = null;
+    container.classList.add('is-dragging');
+    container.style.transition = 'none';
   }, { passive: true });
 
-  mainImagesContainer.addEventListener('touchend', e => {
-    if (!isDragging) return;
-    isDragging = false;
+  container.addEventListener('touchmove', e => {
+    if (!isMobile()) return;
 
-    const deltaX = e.changedTouches[0].clientX - startX;
-    const threshold = 50;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
 
-    if (deltaX < -threshold && currentIndex < images.length - 1) {
-      currentIndex++;
-    } else if (deltaX > threshold && currentIndex > 0) {
-      currentIndex--;
+    /* Decide direction once we have a clear movement */
+    if (isHoriz === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+      isHoriz = Math.abs(dx) > Math.abs(dy);
     }
+    if (!isHoriz) return; /* vertical scroll — let it pass */
 
-    // Trigger the same image switch
-    const thumbsAll = gallery.querySelectorAll('[data-thumb]');
-    images.forEach((img, i) => img.classList.toggle('is-active', i === currentIndex));
-    thumbsAll.forEach((t, i) => t.classList.toggle('is-active', i === currentIndex));
-  }, { passive: true });
+    /* Horizontal swipe confirmed — stop page from scrolling */
+    e.preventDefault();
+
+    dragDelta = dx;
+
+    /* Rubber-band resistance at the first and last image */
+    const atEdge = (currentIndex === 0 && dx > 0) || (currentIndex === images.length - 1 && dx < 0);
+    const drag   = atEdge ? dx / 3 : dx;
+
+    container.style.transform = `translateX(calc(${-currentIndex * 100}% + ${drag}px))`;
+  }, { passive: false }); /* passive: false required to allow preventDefault */
+
+  container.addEventListener('touchend', () => {
+    if (!isMobile()) return;
+    container.classList.remove('is-dragging');
+
+    if (!isHoriz) return;
+
+    if      (dragDelta < -50) goTo(currentIndex + 1);
+    else if (dragDelta >  50) goTo(currentIndex - 1);
+    else                      goTo(currentIndex);     /* snap back */
+  });
+
+  /* Reset on resize (desktop ↔ mobile) */
+  window.addEventListener('resize', () => {
+    if (isMobile()) {
+      goTo(currentIndex, false);
+    } else {
+      container.style.transform  = '';
+      container.style.transition = '';
+    }
+  });
+
+  /* Init */
+  if (isMobile()) goTo(0, false);
 })();
 
 /* ------------------------------------------------------------

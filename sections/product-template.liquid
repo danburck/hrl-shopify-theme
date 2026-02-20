@@ -1,73 +1,53 @@
 {% comment %}
   Product Detail Page — /products/seeker-black
-  Three-column layout (desktop):
-  Left:   Product name, price, description
-  Center: Image gallery + thumbnail selector
-  Right:  Variant selection + pre-order button
-
-  Mobile (top to bottom):
-  1. Product image gallery (swipeable)
-  2. Product name
-  3. Product price
-  4. Variant selector
-  5. Product info / description
+  Desktop (3-col): Info (left) | Gallery + thumbs (centre) | Variant + CTA (right)
+  Mobile (stacked): Gallery → Title → Price → Variant → CTA → Description → Pre-order
 {% endcomment %}
 
 <article
   class="product-page"
-  id="product-gallery"
+  id="product-page"
   itemscope
   itemtype="http://schema.org/Product"
 >
 
-  <!-- LEFT: Info -->
-  <div class="product-page__info">
-    <h1 class="product-page__name" itemprop="name">{{ product.title }}</h1>
+  {%- comment -%}───────────── CENTRE — Gallery (source-first = mobile-first) ─────────────{%- endcomment -%}
+  <div class="product-page__gallery" data-gallery>
 
-    <p class="product-page__price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-      <span itemprop="price">{{ product.selected_or_first_available_variant.price | money }}</span>
-      <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
-    </p>
+    {%- comment -%} Mobile nav arrows (hidden on desktop) {%- endcomment -%}
+    <button class="product-page__nav product-page__nav--prev" aria-label="Previous image" data-nav-prev>‹</button>
+    <button class="product-page__nav product-page__nav--next" aria-label="Next image" data-nav-next>›</button>
 
-    {%- if product.description != blank -%}
-      <div class="product-page__description" itemprop="description">
-        {{ product.description }}
-      </div>
-    {%- endif -%}
-  </div>
-
-  <!-- CENTER: Gallery -->
-  <div class="product-page__gallery">
-
-    <!-- Main image view -->
+    {%- comment -%} Main image {%- endcomment -%}
     <div class="product-page__main-image" data-images-container>
       {%- for image in product.images -%}
-        <img
-          data-main-image="{{ forloop.index0 }}"
-          src="{{ image | image_url: width: 1200 }}"
-          alt="{{ image.alt | escape | default: product.title }}"
-          width="{{ image.width }}"
-          height="{{ image.height }}"
-          class="{%- if forloop.first -%}is-active{%- endif -%}"
-          loading="{%- if forloop.first -%}eager{%- else -%}lazy{%- endif -%}"
-          itemprop="image"
-        >
+        <div class="product-page__slide{%- if forloop.first %} is-active{%- endif -%}" data-main-image="{{ forloop.index0 }}">
+          <img
+            src="{{ image | image_url: width: 1200 }}"
+            alt="{{ image.alt | escape | default: product.title }}"
+            width="{{ image.width }}"
+            height="{{ image.height }}"
+            class="product-page__main-img"
+            loading="{%- if forloop.first -%}eager{%- else -%}lazy{%- endif -%}"
+            itemprop="image"
+          >
+        </div>
       {%- endfor -%}
     </div>
 
-    <!-- Thumbnail selector (desktop click / mobile swipe indicators) -->
+    {%- comment -%} Thumbnail strip (desktop) {%- endcomment -%}
     {%- if product.images.size > 1 -%}
       <div class="product-page__thumbnails" role="list" aria-label="Product image views">
         {%- for image in product.images -%}
           <button
             class="product-page__thumb{%- if forloop.first %} is-active{%- endif -%}"
             data-thumb="{{ forloop.index0 }}"
-            aria-label="View {{ forloop.index }}"
+            aria-label="{{ image.alt | escape | default: product.title }}"
             role="listitem"
           >
             <img
               src="{{ image | image_url: width: 200 }}"
-              alt="{{ image.alt | escape }}"
+              alt=""
               width="200"
               height="200"
               loading="lazy"
@@ -79,52 +59,54 @@
 
   </div>
 
-  <!-- RIGHT: Selection -->
+  {%- comment -%}───────────── NAME ─────────────{%- endcomment -%}
+  <h1 class="product-page__name" itemprop="name">{{ product.title }}</h1>
+
+  {%- comment -%}───────────── PRICE ─────────────{%- endcomment -%}
+  <p class="product-page__price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+    <span itemprop="price" content="{{ product.selected_or_first_available_variant.price | divided_by: 100.0 }}">
+      {{ product.selected_or_first_available_variant.price | money }}
+    </span>
+    <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
+  </p>
+
+  {%- comment -%}───────────── RIGHT — Variant + CTA ─────────────{%- endcomment -%}
   <div class="product-page__selection">
 
     {%- form 'product', product, id: 'product-form', data-product-form: '' -%}
-      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-variant-id>
 
-      {%- if product.has_only_default_variant == false -%}
+      {%- comment -%} Variant select dropdown {%- endcomment -%}
+      {%- unless product.has_only_default_variant -%}
         {%- for option in product.options_with_values -%}
-          <fieldset>
-            <legend class="product-page__variants-label">{{ option.name }}</legend>
-
-            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+          <div class="product-page__variant-wrap">
+            <select
+              class="product-page__variant-select"
+              name="{{ option.name }}"
+              id="option-{{ option.name | downcase }}"
+              aria-label="{{ option.name }}"
+            >
               {%- for value in option.values -%}
-                <label class="product-page__variant-option{%- if option.selected_value == value %} is-selected{%- endif -%}">
-                  <input
-                    type="radio"
-                    name="{{ option.name }}"
-                    value="{{ value }}"
-                    {%- if option.selected_value == value -%}checked{%- endif -%}
-                    style="display: none;"
-                  >
-                  {{ value }}
-                </label>
+                <option
+                  value="{{ value }}"
+                  {%- if option.selected_value == value %} selected{%- endif -%}
+                >Seeker (+ 2 experiences)</option>
               {%- endfor -%}
-            </div>
-          </fieldset>
+            </select>
+            <span class="product-page__select-chevron" aria-hidden="true">›</span>
+          </div>
         {%- endfor -%}
-      {%- endif -%}
+      {%- endunless -%}
 
-      <!-- Pre-order note -->
-      <p class="product-page__preorder-note">
-        Pre-order now — pick up at the HRL Release Event, May 2025.<br>
-        Limited to one per person.
-      </p>
-
-      <!-- Pre-order CTA -->
+      {%- comment -%} Add to Cart {%- endcomment -%}
       <button
         type="submit"
         name="add"
-        class="btn-preorder"
-        {%- if product.selected_or_first_available_variant.available == false -%}
-          disabled
-        {%- endif -%}
+        class="product-page__cta"
+        {%- if product.selected_or_first_available_variant.available == false -%}disabled{%- endif -%}
       >
         {%- if product.selected_or_first_available_variant.available -%}
-          Pre-Order
+          Add to Cart
         {%- else -%}
           Sold Out
         {%- endif -%}
@@ -132,12 +114,24 @@
 
     {%- endform -%}
 
-    <!-- Out of stock policy note -->
-    {%- unless product.selected_or_first_available_variant.available -%}
-      <p class="text-warning text-red" style="margin-top: 8px;">
-        Out of stock items may be refunded
-      </p>
-    {%- endunless -%}
+  </div>
+
+  {%- comment -%}───────────── LEFT — Info (description, pickup, preorder) ─────────────{%- endcomment -%}
+  <div class="product-page__info">
+
+    {%- if product.description != blank -%}
+      <div class="product-page__description" itemprop="description">
+        {{ product.description }}
+      </div>
+    {%- endif -%}
+
+    <p class="product-page__pickup">Pick up at the HRL Release Event, May 2025.</p>
+
+    <div class="product-page__preorder">
+      <p>Pre-order grants you free access to</p>
+      <p>+ release experience in Berlin in May</p>
+      <p>+ next Journal Club Berlin (first come, first serve)</p>
+    </div>
 
   </div>
 

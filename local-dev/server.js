@@ -11,8 +11,20 @@ const express   = require('express');
 const { Liquid } = require('liquidjs');
 const path      = require('path');
 const fs        = require('fs');
+const os        = require('os');
 const chokidar  = require('chokidar');
 const { WebSocketServer } = require('ws');
+
+/* ---- Local network IP (for phone preview) ---- */
+function getLocalIP() {
+  const nets = os.networkInterfaces();
+  for (const iface of Object.values(nets)) {
+    for (const net of iface) {
+      if (net.family === 'IPv4' && !net.internal) return net.address;
+    }
+  }
+  return 'unknown';
+}
 const http      = require('http');
 
 const ROOT   = path.join(__dirname, '..');
@@ -44,8 +56,10 @@ engine.registerFilter('image_url', (img, ...args) => {
   return img;
 });
 engine.registerFilter('money', (val) => {
-  if (val == null) return '€0.00';
-  return `€${(val / 100).toFixed(2)}`;
+  if (val == null) return '0€';
+  const amount = val / 100;
+  // Show as integer if round (e.g. 55€), otherwise 2 decimals (e.g. 55.50€)
+  return `${Number.isInteger(amount) ? amount : amount.toFixed(2)}€`;
 });
 engine.registerFilter('escape', (val) => String(val || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'));
 engine.registerFilter('stylesheet_tag', (url) => `<link rel="stylesheet" href="${url}">`);
@@ -69,7 +83,7 @@ function getMockData(route = '/') {
     title: 'SEEKER',
     handle: 'seeker-black',
     url: '/products/seeker-black',
-    description: '<p>The SEEKER cap. Modern Monk edition. One size fits all. Hand-finished. Pick up at the HRL Release Event, May 2025.</p>',
+    description: '<p>100% organic cotton</p><p>White embroidery on crown</p><p>Made in Portugal</p><p>Realized in Berlin</p>',
     has_only_default_variant: false,
     options_with_values: [
       {
@@ -88,7 +102,7 @@ function getMockData(route = '/') {
     selected_or_first_available_variant: {
       id: 101,
       title: 'Modern Monk',
-      price: 10500,
+      price: 6500,
       available: true,
     },
   };
@@ -138,8 +152,8 @@ function getMockData(route = '/') {
     collections: { all: { products: allProducts } },
     'content_for_header': `<!-- dev header -->
       <script>
-        // WebSocket live reload
-        const ws = new WebSocket('ws://localhost:${WS_PORT}');
+        // WebSocket live reload — use current hostname so it works on phone too
+        const ws = new WebSocket('ws://' + window.location.hostname + ':${WS_PORT}');
         ws.onmessage = () => location.reload();
       </script>`,
     'now': new Date().toISOString(),
@@ -284,7 +298,9 @@ chokidar.watch([
 });
 
 /* ---- Start ---- */
-server.listen(PORT, () => {
-  console.log(`\n🟡 HRL dev server running at http://localhost:${PORT}`);
-  console.log(`   Live reload on ws://localhost:${WS_PORT}\n`);
+server.listen(PORT, '0.0.0.0', () => {
+  const ip = getLocalIP();
+  console.log(`\n🟡 HRL dev server running at:`);
+  console.log(`   Local:   http://localhost:${PORT}`);
+  console.log(`   Network: http://${ip}:${PORT}  ← open this on your phone\n`);
 });
