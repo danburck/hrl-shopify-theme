@@ -17,9 +17,7 @@
     <meta name="description" content="{{ page_description | escape }}">
   {%- endif -%}
 
-  {%- if settings.favicon != blank -%}
-    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
-  {%- endif -%}
+  <link rel="icon" type="image/x-icon" href="{{ 'favicon.ico' | asset_url }}">
 
   <!-- Canonical URL -->
   <link rel="canonical" href="{{ canonical_url }}">

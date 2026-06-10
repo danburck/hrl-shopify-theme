@@ -1,6 +1,6 @@
 {
   "current": {
-    "show_announcement": true,
+    "show_announcement": false,
     "announcement_text": "OUT OF STOCK ITEMS MAY BE REFUNDED",
     "main_site_url": "https://hyperreallove.com",
     "color_yellow": "#fffb29",
