@@ -1,0 +1,4 @@
+{
+  "sections": { "main": { "type": "page-the-drop", "settings": {} } },
+  "order": ["main"]
+}

@@ -172,6 +172,25 @@ function getMockData(route = '/') {
     };
   }
 
+  if (route.startsWith('/pages/')) {
+    const slug = route.split('/pages/')[1];
+    // Page titles keyed by slug
+    const pageTitles = {
+      'manifesto':    'Manifesto',
+      'journal-club': 'Journal Club',
+      'faq':          'FAQ',
+    };
+    const title = pageTitles[slug] || slug;
+    return {
+      ...base,
+      page: { title, content: '', handle: slug, url: route },
+      page_title: `${title} — Hyper Real Love`,
+      page_description: 'Hyper Real Love — a community brand.',
+      template: { name: 'page', suffix: slug },
+      canonical_url: `http://localhost:${PORT}${route}`,
+    };
+  }
+
   return {
     ...base,
     page_title: route === '/' ? shop.name : 'Page',
@@ -196,6 +215,22 @@ function stripShopifyTags(src) {
     .replace(/\{%-?\s*endform\s*-?%\}/g, '</form>');
 }
 
+/* ---- Resolve section file from a page.SLUG.json template ---- */
+function sectionFileForPage(slug) {
+  const tplPath = path.join(ROOT, 'templates', `page.${slug}.json`);
+  if (!fs.existsSync(tplPath)) return null;
+  try {
+    const tpl = JSON.parse(fs.readFileSync(tplPath, 'utf8'));
+    // Pick the first section listed in "order"
+    const firstKey = (tpl.order || Object.keys(tpl.sections || {}))[0];
+    const sectionType = tpl.sections?.[firstKey]?.type;
+    if (!sectionType) return null;
+    return path.join(ROOT, 'sections', `${sectionType}.liquid`);
+  } catch {
+    return null;
+  }
+}
+
 /* ---- Render Liquid layout with section content ---- */
 async function renderPage(route) {
   const data = getMockData(route);
@@ -206,6 +241,9 @@ async function renderPage(route) {
     sectionFile = path.join(ROOT, 'sections', 'main-collection.liquid');
   } else if (route.startsWith('/products/')) {
     sectionFile = path.join(ROOT, 'sections', 'product-template.liquid');
+  } else if (route.startsWith('/pages/')) {
+    const slug = route.split('/pages/')[1];
+    sectionFile = sectionFileForPage(slug);
   } else {
     sectionFile = null;
   }
@@ -259,15 +297,19 @@ app.get('/products/:handle', async (req, res) => {
   }
 });
 
-// /journal-club → /pages/journal-club
+// convenience redirects
+app.get('/manifesto',    (req, res) => res.redirect(301, '/pages/manifesto'));
 app.get('/journal-club', (req, res) => res.redirect(301, '/pages/journal-club'));
+app.get('/faq',          (req, res) => res.redirect(301, '/pages/faq'));
 
 app.get('/pages/:slug', async (req, res) => {
-  res.send(`<html><body style="font-family: serif; padding: 40px;">
-    <h1>${req.params.slug}</h1>
-    <p>Page content goes here — add real content when connecting to Shopify.</p>
-    <p><a href="/">← Back to shop</a></p>
-  </body></html>`);
+  try {
+    const html = await renderPage(`/pages/${req.params.slug}`);
+    res.send(html);
+  } catch (e) {
+    console.error(e);
+    res.status(500).send(`<pre>${e.message}\n${e.stack}</pre>`);
+  }
 });
 
 app.get('*', (req, res) => res.redirect('/'));

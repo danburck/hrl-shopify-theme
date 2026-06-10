@@ -1,0 +1,4 @@
+{
+  "sections": { "main": { "type": "page-legal-notice", "settings": {} } },
+  "order": ["main"]
+}

@@ -4,7 +4,7 @@
 
     <!-- ── DESKTOP LEFT / MOBILE CENTER : HRL Logo ── -->
     <div class="site-header__logo">
-      <a href="{{ settings.main_site_url | default: '/' }}" aria-label="{{ shop.name }} — go to main site">
+      <a href="/" aria-label="{{ shop.name }} — home">
         <img
           src="{{ 'HRL_logo.svg' | asset_url }}"
           alt="{{ shop.name }}"
@@ -40,13 +40,16 @@
     <!-- ── DESKTOP RIGHT : nav links + cart ── -->
     <nav class="site-header__nav" aria-label="Main navigation">
       <a href="/pages/journal-club" class="nav-link">Journal Club</a>
+      <a href="/pages/schedule" class="nav-link">Schedule</a>
+      <a href="/pages/caps" class="nav-link">Caps</a>
       <button
         class="nav-link cart-toggle"
         data-cart-toggle
         aria-label="Open cart"
         aria-controls="cart-drawer"
         aria-expanded="false"
-      >Cart <span data-cart-count>(0)</span></button>
+        style="{% if cart.item_count == 0 %}display:none{% endif %}"
+      >Cart <span data-cart-count>({{ cart.item_count }})</span></button>
     </nav>
 
     <!-- ── MOBILE RIGHT : cart count only, e.g. "(1)" ── -->
@@ -54,7 +57,8 @@
       id="mobile-cart-toggle"
       class="site-header__mobile-cart nav-link"
       aria-label="Open cart"
-    ><span data-cart-count>(0)</span></button>
+      style="{% if cart.item_count == 0 %}display:none{% endif %}"
+    ><span data-cart-count>({{ cart.item_count }})</span></button>
 
   </div>
 </header>

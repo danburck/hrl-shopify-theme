@@ -1,5 +1,5 @@
 <!-- Mobile Cart Drawer (full screen) -->
-<div
+<aside
   id="mobile-cart-drawer"
   class="mobile-cart-drawer"
   role="dialog"
@@ -7,8 +7,14 @@
   aria-modal="true"
   aria-hidden="true"
 >
+
+  <!-- Header -->
   <div class="mobile-cart-drawer__header">
-    <h2 class="title title-md">Cart</h2>
+    <span class="cart-drawer__title">
+      Cart <span class="cart-drawer__count" data-cart-title-count>
+        {%- if cart.item_count > 0 -%}({{ cart.item_count }}){%- else -%}(2){%- endif -%}
+      </span>
+    </span>
     <button
       id="mobile-cart-close"
       class="mobile-cart-drawer__close"
@@ -16,39 +22,95 @@
     >&#x2715;</button>
   </div>
 
+  <!-- Items — shares cart-item styles with desktop drawer -->
   <div class="cart-drawer__body">
-    {%- if cart.item_count == 0 -%}
-      <p class="cart-drawer__empty">Your cart is empty.</p>
-    {%- else -%}
+
+    {%- if cart.item_count > 0 -%}
+
       {%- for item in cart.items -%}
-        <div class="cart-item">
-          <img
-            class="cart-item__image"
-            src="{{ item.image | image_url: width: 160 }}"
-            alt="{{ item.title | escape }}"
-            width="80"
-            height="80"
-            loading="lazy"
-          >
-          <div class="cart-item__info">
-            <p class="cart-item__name">{{ item.product.title }}</p>
+        <div class="cart-item" data-line-item="{{ item.key }}" data-unit-price="{{ item.price }}">
+          <div class="cart-item__image-wrap">
+            <img
+              class="cart-item__image"
+              src="{{ item.image | image_url: width: 200 }}"
+              alt="{{ item.title | escape }}"
+              loading="lazy"
+            >
+          </div>
+          <div class="cart-item__details">
+            <div class="cart-item__name-row">
+              <span class="cart-item__name">{{ item.product.title }}</span>
+              <span class="cart-item__price">{{ item.final_line_price | money }}</span>
+            </div>
             {%- if item.variant.title != 'Default Title' -%}
-              <p class="text-sm">{{ item.variant.title }}</p>
+              <span class="cart-item__variant">{{ item.variant.title }}</span>
             {%- endif -%}
-            <p class="cart-item__price">{{ item.final_line_price | money }}</p>
+            <div class="cart-item__qty-wrap">
+              <button class="cart-item__qty-btn" data-action="decrease" data-line-key="{{ item.key }}" aria-label="Decrease quantity">&#x2212;</button>
+              <span class="cart-item__qty-val">{{ item.quantity }}</span>
+              <button class="cart-item__qty-btn" data-action="increase" data-line-key="{{ item.key }}" aria-label="Increase quantity">+</button>
+            </div>
           </div>
         </div>
       {%- endfor -%}
+
+    {%- else -%}
+
+      {%- comment -%} ── MOCKUP ── {%- endcomment -%}
+      <div class="cart-item" data-mockup-item>
+        <div class="cart-item__image-wrap">
+          <div class="cart-item__image-placeholder" aria-hidden="true"></div>
+        </div>
+        <div class="cart-item__details">
+          <div class="cart-item__name-row">
+            <span class="cart-item__name">Seeker Tee</span>
+            <span class="cart-item__price" data-item-price="95">€95</span>
+          </div>
+          <span class="cart-item__variant">Marigold / Size M</span>
+          <div class="cart-item__qty-wrap">
+            <button class="cart-item__qty-btn" data-action="decrease" aria-label="Decrease">&#x2212;</button>
+            <span class="cart-item__qty-val">1</span>
+            <button class="cart-item__qty-btn" data-action="increase" aria-label="Increase">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cart-item" data-mockup-item>
+        <div class="cart-item__image-wrap">
+          <div class="cart-item__image-placeholder" aria-hidden="true"></div>
+        </div>
+        <div class="cart-item__details">
+          <div class="cart-item__name-row">
+            <span class="cart-item__name">Canvas Hoodie</span>
+            <span class="cart-item__price" data-item-price="145">€145</span>
+          </div>
+          <span class="cart-item__variant">Black / Size L</span>
+          <div class="cart-item__qty-wrap">
+            <button class="cart-item__qty-btn" data-action="decrease" aria-label="Decrease">&#x2212;</button>
+            <span class="cart-item__qty-val">1</span>
+            <button class="cart-item__qty-btn" data-action="increase" aria-label="Increase">+</button>
+          </div>
+        </div>
+      </div>
+
     {%- endif -%}
+
   </div>
 
+  <!-- Footer -->
   <div class="cart-drawer__footer">
-    {%- if cart.item_count > 0 -%}
-      <div class="flex justify-between items-center">
-        <span class="title title-md">Total</span>
-        <span class="text-md">{{ cart.total_price | money }}</span>
-      </div>
-      <a href="/checkouts" class="btn-checkout">Proceed to Checkout</a>
-    {%- endif -%}
+    <div class="cart-drawer__subtotal">
+      <span class="cart-drawer__subtotal-label">Total</span>
+      <span class="cart-drawer__subtotal-price" id="mobile-cart-subtotal">
+        {%- if cart.item_count > 0 -%}
+          {{ cart.total_price | money }}
+        {%- else -%}
+          €240
+        {%- endif -%}
+      </span>
+    </div>
+    <p class="cart-drawer__shipping-note">Pickup information at checkout</p>
+    <a href="/checkout" class="btn-checkout">Checkout</a>
   </div>
-</div>
+
+</aside>

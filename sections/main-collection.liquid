@@ -7,45 +7,46 @@
   Locked products: dimmed image + muted text.
 {% endcomment %}
 
-{%- assign active_handle = 'seeker-black' -%}
+{%- assign active_handle = 'seeker-cap' -%}
 {%- assign all_products = collections.all.products -%}
 
 <section class="main-collection" aria-label="Products">
   <div class="product-grid">
 
-    {%- comment -%}── ROW 1 (slots 1–4) ──{%- endcomment -%}
-    {%- for i in (0..3) -%}
-      {%- assign product = all_products[i] -%}
-      {%- assign is_active = false -%}
-      {%- if product.handle == active_handle -%}{%- assign is_active = true -%}{%- endif -%}
+    {%- comment -%}── Slot 1: SEEKER (active) ──{%- endcomment -%}
+    {%- assign seeker = all_products | where: 'handle', active_handle | first -%}
+    <a href="{{ seeker.url }}" class="product-card product-card--active" aria-label="{{ seeker.title }}">
+      <div class="product-card__image-wrap">
+        {%- if seeker.featured_image -%}
+          <img
+            class="product-card__image"
+            src="{{ seeker.featured_image | image_url: width: 600 }}"
+            alt="{{ seeker.featured_image.alt | escape | default: seeker.title }}"
+            width="600"
+            height="700"
+            loading="eager"
+          >
+        {%- else -%}
+          <div class="product-card__image product-card__image--empty"></div>
+        {%- endif -%}
+      </div>
+      <div class="product-card__info">
+        <p class="product-card__name">{{ seeker.title }}</p>
+        <p class="product-card__price">{{ seeker.selected_or_first_available_variant.price | money }}</p>
+      </div>
+    </a>
 
-      {%- if is_active -%}
-        <a href="{{ product.url }}" class="product-card product-card--active" aria-label="{{ product.title }}">
-      {%- else -%}
-        <div class="product-card product-card--locked" aria-hidden="true">
-      {%- endif -%}
-
+    {%- comment -%}── Row 1: slots 2–4 — 3 locked placeholders ──{%- endcomment -%}
+    {%- for i in (1..3) -%}
+      <div class="product-card product-card--locked product-card--deep" aria-hidden="true">
         <div class="product-card__image-wrap">
-          {%- if product.featured_image -%}
-            <img
-              class="product-card__image"
-              src="{{ product.featured_image | image_url: width: 600 }}"
-              alt="{{ product.featured_image.alt | escape | default: product.title }}"
-              width="600"
-              height="700"
-              loading="{%- if i == 0 -%}eager{%- else -%}lazy{%- endif -%}"
-            >
-          {%- else -%}
-            <div class="product-card__image product-card__image--empty"></div>
-          {%- endif -%}
+          <img class="product-card__image" src="{{ 'cap-hidden.webp' | asset_url }}" alt="" width="600" height="700" loading="lazy">
         </div>
-
         <div class="product-card__info">
-          <p class="product-card__name">{{ product.title }}</p>
-          <p class="product-card__price">{{ product.selected_or_first_available_variant.price | money }}</p>
+          <p class="product-card__name">?</p>
+          <p class="product-card__price">?</p>
         </div>
-
-      {%- if is_active -%}</a>{%- else -%}</div>{%- endif -%}
+      </div>
     {%- endfor -%}
 
     {%- comment -%}── TAGLINE spanning all 4 columns ──{%- endcomment -%}
@@ -53,29 +54,15 @@
       <em>which one are you right now?</em>
     </div>
 
-    {%- comment -%}── ROW 2 (slots 5–8) — all locked ──{%- endcomment -%}
-    {%- for i in (4..7) -%}
-      {%- assign product = all_products[i] -%}
-
+    {%- comment -%}── Row 2: slots 5–8 — 4 locked placeholders ──{%- endcomment -%}
+    {%- for i in (1..4) -%}
       <div class="product-card product-card--locked product-card--deep" aria-hidden="true">
         <div class="product-card__image-wrap">
-          {%- if product.featured_image -%}
-            <img
-              class="product-card__image"
-              src="{{ product.featured_image | image_url: width: 600 }}"
-              alt=""
-              width="600"
-              height="700"
-              loading="lazy"
-            >
-          {%- else -%}
-            <div class="product-card__image product-card__image--empty"></div>
-          {%- endif -%}
+          <img class="product-card__image" src="{{ 'cap-hidden.webp' | asset_url }}" alt="" width="600" height="700" loading="lazy">
         </div>
-
         <div class="product-card__info">
-          <p class="product-card__name">{{ product.title }}</p>
-          <p class="product-card__price">{{ product.selected_or_first_available_variant.price | money }}</p>
+          <p class="product-card__name">?</p>
+          <p class="product-card__price">?</p>
         </div>
       </div>
     {%- endfor -%}

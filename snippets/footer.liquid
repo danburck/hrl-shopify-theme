@@ -1,67 +1,57 @@
 <footer class="site-footer" role="contentinfo">
+
+  <!-- Blur — rasterised webp, no SVG filter flicker on resize -->
+  <div class="site-footer__blur" aria-hidden="true">
+    <img src="{{ 'footer_blur_desktop.webp' | asset_url }}" alt="" class="site-footer__blur-img">
+  </div>
+
+  <!-- Main content -->
   <div class="site-footer__inner">
 
-    <!-- Newsletter Signup -->
+    <!-- Left: Newsletter + Instagram + Copyright -->
     <div class="footer-newsletter">
-      <h2 class="footer-newsletter__title">Stay in the loop</h2>
-      <p class="footer-newsletter__subtitle">Notes on culture, energy and the things that matter.</p>
+      <h2 class="footer-newsletter__title">Join the Journal Club</h2>
+      <p class="footer-newsletter__subtitle">This is your invitation to practice raising individual consciousness, together. Sign up to join the next Journal Club online and receive letters on drops and events in your city.</p>
 
-      {%- form 'customer', id: 'footer-newsletter-form' -%}
-        <input type="hidden" name="contact[tags]" value="newsletter">
-        <div class="footer-newsletter__form">
-          <input
-            type="email"
-            name="contact[email]"
-            class="footer-newsletter__input"
-            placeholder="your@email.com"
-            autocomplete="email"
-            required
-            aria-label="Email address"
-          >
-          <button type="submit" class="footer-newsletter__submit">
-            Join
-          </button>
-        </div>
-        {%- if form.posted_successfully? -%}
-          <p class="text-sm text-italic" style="margin-top: 8px; color: rgba(250,249,246,0.7);">
-            You're in. Welcome.
-          </p>
-        {%- endif -%}
-      {%- endform -%}
+      <script async data-uid="a433277e18" src="https://hyper-real-love-2.kit.com/a433277e18/index.js"></script>
+
+      <!-- Instagram -->
+      <a href="https://instagram.com/hyperreallove" class="footer-instagram" target="_blank" rel="noopener noreferrer" aria-label="HRL on Instagram">
+        <img src="{{ 'instagram_logo.webp' | asset_url }}" alt="Instagram" class="footer-instagram__logo">
+      </a>
+
+      <!-- Copyright -->
+      <p class="footer-copyright">&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
     </div>
 
-    <!-- Footer Links -->
-    <div class="footer-links">
+    <!-- Right: Navigation links -->
+    <nav class="footer-links" aria-label="Footer navigation">
 
       <div class="footer-links__group">
-        <p class="footer-links__group-title">Shop</p>
-        <a href="/">Products</a>
-        <a href="/products/seeker-black">Seeker Cap</a>
-        <a href="/policies/shipping-policy">Shipping</a>
-        <a href="/cart">Cart</a>
-      </div>
-
-      <div class="footer-links__group">
-        <p class="footer-links__group-title">Community</p>
-        <a href="/pages/journal-club">Journal Club</a>
+        <p class="footer-links__group-title">About</p>
         <a href="/pages/manifesto">Manifesto</a>
+        <a href="/pages/journal-club">Journal Club</a>
         <a href="/pages/faq">FAQ</a>
         <a href="/pages/careers">Careers</a>
       </div>
 
       <div class="footer-links__group">
-        <p class="footer-links__group-title">Legal</p>
-        <a href="/pages/impressum">Impressum</a>
-        <a href="/pages/datenschutz">Datenschutz</a>
-        <a href="/pages/widerrufsbelehrung">Widerruf</a>
-        <a href="/policies/terms-of-service">AGB</a>
+        <p class="footer-links__group-title">Shop</p>
+        <a href="/pages/the-drop">Pickup</a>
+        <a href="/pages/materials">Materials</a>
+        <a href="/pages/refund-policy">Refund Policy</a>
       </div>
 
-    </div>
+      <div class="footer-links__group">
+        <p class="footer-links__group-title">Legal</p>
+        <a href="/pages/privacy-policy">Privacy Policy</a>
+        <a href="/pages/terms-of-service">Terms of Service</a>
+        <a href="/pages/legal-notice">Legal Notice</a>
+        <a href="/pages/contact">Contact</a>
+      </div>
+
+    </nav>
 
   </div>
 
-  <div class="site-footer__bottom">
-    <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
-  </div>
 </footer>
