@@ -315,6 +315,28 @@ ul, ol {
   75%       { transform: scale(1.15) rotate(1deg);    opacity: 0.92; }
 }
 
+/* ── Mobile menu toggle (hamburger) — hidden on desktop ── */
+.site-header__menu-toggle {
+  display: none;  /* shown only on mobile via media query */
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #fffb29;
+  transition: opacity 0.2s ease;
+}
+
+.site-header__menu-toggle:hover {
+  opacity: 0.8;
+}
+
+.site-header__menu-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
 /* ── Nav links (shared style) ── */
 .nav-link {
   font-family: var(--font-body);
@@ -701,6 +723,16 @@ ul, ol {
   transition: opacity var(--transition-fast);
 }
 .mobile-nav-drawer__links a:hover { opacity: 0.6; }
+
+/* Pulsating blurb at top of mobile drawer — links to manifesto */
+.mobile-nav-drawer__blurb {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0;
+  margin-bottom: var(--space-4);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.mobile-nav-drawer__blurb:hover { opacity: 1; }
 
 /* Mobile cart drawer — fullscreen */
 .mobile-cart-drawer {
@@ -1408,20 +1440,17 @@ ul, ol {
     --header-height: 76px; /* +24px to match desktop increase */
   }
 
-  /* ── Mobile header layout: blurb(L) | HRL(C) | cart(R) ── */
+  /* ── Mobile header layout: hamburger(L) | HRL(C) | cart(R) ── */
 
-  /* Blurb: move from absolute-center to static left slot */
+  /* Blurb: hidden on mobile (replaced by hamburger) */
   .site-header__blurb {
-    position: static;
-    transform: none;
-    pointer-events: all;  /* tappable on mobile */
-    cursor: pointer;
-    order: 0;
+    display: none;
   }
 
-  /* Override desktop hover — no translateX on mobile, just scale in place */
-  .site-header__blurb:hover {
-    transform: scale(1.2);
+  /* Hamburger menu: shown on mobile, left slot */
+  .site-header__menu-toggle {
+    display: flex;
+    order: 0;
   }
 
   /* Logo: absolute center */

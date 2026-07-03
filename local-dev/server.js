@@ -28,8 +28,8 @@ function getLocalIP() {
 const http      = require('http');
 
 const ROOT   = path.join(__dirname, '..');
-const PORT   = 3000;
-const WS_PORT = 3001;
+const PORT   = parseInt(process.env.PORT, 10) || 3000;
+const WS_PORT = PORT + 1;
 
 const app    = express();
 const server = http.createServer(app);
@@ -179,6 +179,8 @@ function getMockData(route = '/') {
       'manifesto':    'Manifesto',
       'journal-club': 'Journal Club',
       'faq':          'FAQ',
+      'letters':      'Letters',
+      'home':         'Hyper Real Love',
     };
     const title = pageTitles[slug] || slug;
     return {

@@ -475,9 +475,7 @@ function closeDrawer(drawerEl, overlayEl) {
         });
         // Update subtotal
         document.querySelectorAll('#cart-subtotal, #mobile-cart-subtotal').forEach(el => {
-          el.textContent = Shopify.formatMoney
-            ? Shopify.formatMoney(cart.total_price, '{{amount}} €')
-            : `€${(cart.total_price / 100).toFixed(2)}`;
+          el.textContent = formatMoney(cart.total_price);
         });
         // Re-render items in both drawers
         const bodies = document.querySelectorAll('.cart-drawer__body');

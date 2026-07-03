@@ -16,15 +16,11 @@
       </a>
     </div>
 
-    <!-- ── CENTER : Yellow Blurb ── -->
-    <!-- Desktop: decorative/alive, pointer-events none -->
-    <!-- Mobile: tappable — opens nav drawer -->
-    <button
-      id="mobile-nav-toggle"
+    <!-- ── CENTER : Yellow Blurb (desktop only — clickable/alive) ── -->
+    <a
+      href="/pages/manifesto"
       class="site-header__blurb"
-      aria-label="Open navigation"
-      aria-controls="mobile-nav-drawer"
-      aria-expanded="false"
+      aria-label="Manifesto"
     >
       <img
         src="{{ 'yellow_blurb.svg' | asset_url }}"
@@ -35,6 +31,30 @@
         aria-hidden="true"
         draggable="false"
       >
+    </a>
+
+    <!-- ── Mobile Menu Button (mobile only — hamburger opens nav drawer) ── -->
+    <button
+      id="mobile-nav-toggle"
+      class="site-header__menu-toggle"
+      aria-label="Open navigation"
+      aria-controls="mobile-nav-drawer"
+      aria-expanded="false"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+        aria-hidden="true"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <line x1="3" y1="6" x2="21" y2="6" stroke="#fffb29" />
+        <line x1="3" y1="12" x2="21" y2="12" stroke="#fffb29" />
+        <line x1="3" y1="18" x2="21" y2="18" stroke="#fffb29" />
+      </svg>
     </button>
 
     <!-- ── DESKTOP RIGHT : nav links + cart ── -->
