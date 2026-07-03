@@ -11,16 +11,19 @@ Monthly task: pull the current month's confirmed events from the Notion "Journal
 
 Database: `https://app.notion.com/p/232f7c1c5afa8090aa72e112fe329ce7` (data source id `collection://232f7c1c-5afa-8015-834f-000b664fa604`, titled "Journal Clubs (Database)").
 
+**The target month is always the current calendar month** — derive it from today's date (system context), not from whichever event prompted the update. The page is a month view: it should show every confirmed event in that month regardless of whether it has already happened yet by the time someone views the page (e.g. if you run this on the 20th, an event from the 1st still belongs on the page).
+
 This workspace is on a plan below Business, so `notion-query-database-view` and `notion-query-data-sources` will fail with a "requires Business plan" error — don't bother trying them. Instead:
 
 1. Use `notion-search` with `data_source_url: "collection://232f7c1c-5afa-8015-834f-000b664fa604"` and a query like the target month name (e.g. "August") or "Journal Club" to surface recently-edited pages — results include a `timestamp` (last-edited time) that's a good signal for which pages are current.
 2. `notion-fetch` each candidate page individually to read its properties: `Status`, `date:Date:start`, `Title`, `Subtitle`, `Address`, `Type`, `Link`, `Theme`.
 3. Filter to pages where:
-   - `date:Date:start` falls in the target month
-   - `Status == "Upcoming"` — **exclude** `Draft`, `Completed`, and `Cancelled`. Draft rows are events being planned that aren't confirmed yet; don't publish them even if the date matches.
-4. Note the `Theme` multi-select value on the Upcoming rows (usually one shared theme per month, e.g. "Learning To Listen"). If no Upcoming row has a Theme set yet, ask the user for the month's theme rather than guessing or reusing last month's.
+   - `date:Date:start` falls in the target (current) month
+   - `Status IN ("Upcoming", "Completed")` — **exclude** `Draft` and `Cancelled` only. Draft rows are events still being planned/unconfirmed; don't publish them even if the date matches. But a `Completed` event from earlier in the same month still belongs on the page — don't drop it just because it's in the past. (Re-check this every run: an event that was `Draft` last time you looked may have flipped to `Upcoming` since, and one that was `Upcoming` may now be `Completed`.)
+   - If `Link` is empty (common for already-completed events with no public registration link), omit the "Join" button for that card instead of rendering a dead link — confirm with the user if unsure whether an alternate link (e.g. recap post) should go there instead.
+4. Note the `Theme` multi-select value on the confirmed rows (usually one shared theme per month, e.g. "Learning To Listen"). If none of them have a Theme set yet, ask the user for the month's theme rather than guessing or reusing last month's.
 
-**Always show the user the filtered event list (and theme) and get explicit confirmation before editing the page** — the Draft/Upcoming distinction is a judgment call that should stay human-approved, and Notion status can be stale.
+**Always show the user the filtered event list (and theme) and get explicit confirmation before editing the page** — the Draft/Upcoming/Completed distinction is a judgment call that should stay human-approved, and Notion status can be stale or change between runs within the same month.
 
 ## 2. Edit the page section
 
@@ -53,6 +56,8 @@ Per-event pattern:
   </div>
 </article>
 ```
+
+If `Link` is empty, omit the whole `spaces-event__action` div (no Join button) rather than rendering a link to nowhere.
 
 Sort events chronologically. Convert the Notion UTC datetime to CET/CEST local time for the displayed time.
 
